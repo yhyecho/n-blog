@@ -29,20 +29,24 @@ app.use(session({
 
 app.use(flash())
 
-routes(app)
+app.use(require('express-formidable')({
+  uploadDir: path.join(__dirname, 'public/img'),
+  keepExtensions: true
+}))
 
-// 设置模版全局常量
 app.locals.blog = {
   title: pkg.name,
   description: pkg.description
 }
 
-// 添加模版必须的三个变量
 app.use((req, resp, next) => {
-  res.locals.user = req.session.user
-  res.locals.success = req.flash('success').toString()
-  res.locals.error = req.flash('error').toString()
+  resp.locals.user = req.session.user
+  resp.locals.success = req.flash('success').toString()
+  resp.locals.error = req.flash('error').toString()
+  next()
 })
+
+routes(app)
 
 app.listen(config.port, () => {
   console.log(`${pkg.name} listening on port ${config.port}`)
